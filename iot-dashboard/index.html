@@ -1,0 +1,1032 @@
+<!doctype html>
+<html lang="bs">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>IOT Dashboard</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg0: #060915;
+      --bg1: #0b1022;
+      --glass: rgba(255, 255, 255, .08);
+      --glass2: rgba(255, 255, 255, .12);
+      --border: rgba(255, 255, 255, .10);
+      --text: rgba(255, 255, 255, .92);
+      --muted: rgba(255, 255, 255, .70);
+      --muted2: rgba(255, 255, 255, .55);
+
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --cyan: #22d3ee;
+      --blue: #60a5fa;
+      --violet: #a78bfa;
+      --pink: #fb7185;
+      --yellow: #facc15;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(96, 165, 250, .25), transparent 60%),
+        radial-gradient(900px 500px at 85% 0%, rgba(167, 139, 250, .22), transparent 60%),
+        radial-gradient(800px 500px at 70% 80%, rgba(34, 211, 238, .14), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: rgba(6, 9, 21, .55);
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 260px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: .2px;
+    }
+
+    .brand p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    .pillrow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .10);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, .18);
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .35);
+      box-shadow: 0 0 10px rgba(255, 255, 255, .12);
+    }
+
+    .pill.ok .dot {
+      background: var(--ok);
+      box-shadow: 0 0 14px rgba(34, 197, 94, .45);
+    }
+
+    .pill.warn .dot {
+      background: var(--warn);
+      box-shadow: 0 0 14px rgba(245, 158, 11, .45);
+    }
+
+    .pill.bad .dot {
+      background: var(--bad);
+      box-shadow: 0 0 14px rgba(239, 68, 68, .45);
+    }
+
+    /* Buttons */
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 14px 0 16px;
+    }
+
+    button {
+      border: 0;
+      padding: 11px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 800;
+      color: rgba(255, 255, 255, .92);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .07));
+      border: 1px solid rgba(255, 255, 255, .10);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, .22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+  
+
+    button.ghost {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .04));
+      opacity: .92;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    /* Layout grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .card {
+      position: relative;
+      border-radius: 22px;
+      padding: 16px;
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(255, 255, 255, .10);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, .28);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: radial-gradient(600px 220px at 20% 10%, rgba(255, 255, 255, .12), transparent 55%);
+      pointer-events: none;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, .78);
+      font-weight: 800;
+      letter-spacing: .2px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .kpi {
+      grid-column: span 3;
+      min-height: 160px;
+    }
+
+    @media (max-width: 980px) {
+      .kpi {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .kpi {
+        grid-column: span 12;
+      }
+    }
+
+    .wide {
+      grid-column: span 6;
+    }
+
+    @media (max-width: 980px) {
+      .wide {
+        grid-column: span 12;
+      }
+    }
+
+    .big {
+      position: relative;
+      z-index: 1;
+      font-size: 44px;
+      font-weight: 900;
+      line-height: 1;
+      margin: 8px 0 6px;
+      text-shadow: 0 10px 20px rgba(0, 0, 0, .25);
+    }
+
+    .sub {
+      position: relative;
+      z-index: 1;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* themed KPI backgrounds */
+    .theme-temp {
+      background:
+        radial-gradient(520px 220px at 30% 0%, rgba(96, 165, 250, .35), transparent 60%),
+        rgba(255, 255, 255, .07);
+      border-color: rgba(96, 165, 250, .22);
+    }
+
+    .theme-hum {
+      background:
+        radial-gradient(520px 220px at 30% 0%, rgba(34, 211, 238, .30), transparent 60%),
+        rgba(255, 255, 255, .07);
+      border-color: rgba(34, 211, 238, .22);
+    }
+
+    .theme-light {
+      background:
+        radial-gradient(520px 220px at 30% 0%, rgba(250, 204, 21, .28), transparent 60%),
+        rgba(255, 255, 255, .07);
+      border-color: rgba(250, 204, 21, .22);
+    }
+
+    .theme-soil {
+      background:
+        radial-gradient(520px 220px at 30% 0%, rgba(167, 139, 250, .28), transparent 60%),
+        rgba(255, 255, 255, .07);
+      border-color: rgba(167, 139, 250, .22);
+    }
+
+    .theme-water {
+      background:
+        radial-gradient(520px 220px at 30% 0%, rgba(96, 165, 250, .25), transparent 60%),
+        rgba(255, 255, 255, .07);
+      border-color: rgba(96, 165, 250, .22);
+    }
+
+    /* progress ring */
+    .ringWrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .ring {
+      width: 120px;
+      height: 120px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background:
+        conic-gradient(var(--ringColor, var(--cyan)) calc(var(--p, 0) * 1%), rgba(255, 255, 255, .10) 0);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, .28);
+      border: 1px solid rgba(255, 255, 255, .10);
+    }
+
+    .ringInner {
+      width: 92px;
+      height: 92px;
+      border-radius: 999px;
+      background: rgba(8, 12, 26, .72);
+      border: 1px solid rgba(255, 255, 255, .10);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 26px;
+      color: rgba(255, 255, 255, .92);
+    }
+
+    /* Status/meta */
+    .meta {
+      display: grid;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .metaRow {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .08);
+      color: rgba(255, 255, 255, .88);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .metaRow span {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    /* Log */
+    #out {
+      white-space: pre-wrap;
+      background: rgba(0, 0, 0, .35);
+      border: 1px solid rgba(255, 255, 255, .10);
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 130px;
+      overflow: auto;
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(255, 255, 255, .82);
+      position: relative;
+      z-index: 1;
+    }
+
+    .liveRow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, .72);
+      position: relative;
+      z-index: 1;
+    }
+
+    .liveDot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--ok);
+      box-shadow: 0 0 14px rgba(34, 197, 94, .45);
+    }
+
+    .liveDot.off {
+      background: rgba(255, 255, 255, .30);
+      box-shadow: none;
+    }
+
+    .muted {
+      color: rgba(255, 255, 255, .60);
+    }
+
+    details.rawjson summary {
+      cursor: pointer;
+      user-select: none;
+      color: rgba(255, 255, 255, .78);
+      font-weight: 800;
+      margin-top: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    details.rawjson pre {
+      margin-top: 8px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, .28);
+      border: 1px solid rgba(255, 255, 255, .10);
+      max-height: 240px;
+      overflow: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.35;
+      color: rgba(255, 255, 255, .80);
+      white-space: pre;
+      position: relative;
+      z-index: 1;
+    }
+
+    footer {
+      padding: 18px;
+      color: rgba(255, 255, 255, .55);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* small helpers */
+    .rightCol {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .chipBtn {
+      border-radius: 999px;
+      padding: 10px 12px;
+    }
+
+    .history-card {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .history-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .muted {
+      opacity: .75;
+      margin: 10px 0;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 12px;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    .history-table th,
+    .history-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      text-align: left;
+    }
+
+    .history-table th {
+      opacity: .85;
+      font-weight: 600;
+    }
+
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .chart-card {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    @media (max-width: 900px) {
+      .charts {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    /* ====== DASHBOARD RE-LAYOUT (desktop + mobile) ====== */
+    .dash {
+      display: grid;
+      gap: 14px;
+    }
+
+    .kpiRow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .kpiCard {
+      min-height: 170px;
+    }
+
+    .mainRow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .panel {
+      min-height: 320px;
+    }
+
+    .log {
+      min-height: 220px;
+    }
+
+    /* history card */
+    .history .history-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .history .history-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .history .historyBody {
+      margin-top: 10px;
+    }
+
+    .history.expanded {
+      grid-column: 1 / -1;
+    }
+
+    /* ako ikad bude u gridu sa više kolona */
+    .canvasBox {
+      height: 170px;
+    }
+
+    .canvasBox canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    /* nicer select */
+    select.select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      padding: 11px 38px 11px 14px;
+      border-radius: 14px;
+      font-weight: 800;
+      color: rgba(255, 255, 255, .92);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .07));
+      border: 1px solid rgba(255, 255, 255, .10);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, .22);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      cursor: pointer;
+    }
+
+    select.select:focus {
+      outline: 2px solid rgba(96, 165, 250, .35);
+      outline-offset: 2px;
+    }
+
+    .history-actions {
+      position: relative;
+    }
+
+    .history-actions::after {
+      content: "▾";
+      position: absolute;
+      right: 14px;
+      pointer-events: none;
+      opacity: .75;
+      transform: translateY(1px);
+    }
+
+    /* medium screens */
+    @media (max-width: 1100px) {
+      .kpiRow {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 820px) {
+      .kpiRow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .mainRow {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        min-height: 0;
+      }
+    }
+
+    /* mobile: KPI u jednom redu (scroll), ostalo vertikalno */
+    @media (max-width: 560px) {
+      .wrap {
+        padding: 14px;
+      }
+
+      .brand {
+        min-width: 0;
+      }
+
+      .kpiRow {
+        grid-auto-flow: column;
+        grid-auto-columns: 86%;
+        grid-template-columns: unset;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: 8px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .kpiRow .card {
+        scroll-snap-align: start;
+      }
+
+      .big {
+        font-size: 40px;
+      }
+
+      .ring {
+        width: 112px;
+        height: 112px;
+      }
+
+      .ringInner {
+        width: 86px;
+        height: 86px;
+        font-size: 24px;
+      }
+
+      .history-table {
+        min-width: 640px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="topbar wrap">
+      <div class="brand">
+        <h1>IoT Dashboard – Smart Zalijevanje</h1>
+        <p>Plant monitoring / zalijevanje — live prikaz zadnjeg mjerenja</p>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="pillrow">
+        <div class="pill ok" id="pillOnline"><span class="dot"></span><span>Status konekcije: Online</span></div>
+
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="row">
+      <button id="btnLogin">Anonymous login</button>
+
+
+      <div class="spacer"></div>
+
+      <div class="rightCol">
+        <div class="pill" id="badgeAuth"><span class="dot"></span><span>Auth: nepoznato</span></div>
+        <div class="pill" id="badgeWater"><span class="dot"></span><span>Pumpa: nepoznato</span></div>
+        <div class="pill" id="badgeTank"><span class="dot"></span><span>Rezervoar: nepoznato</span></div>
+        <div class="pill" id="badgeLight"><span class="dot"></span><span>Svjetlo: nepoznato</span></div>
+        <div class="pill" id="badgeSoil"><span class="dot"></span><span>Zemlja: nepoznato</span></div>
+      </div>
+    </div>
+
+
+    <section class="dash">
+      <div class="kpiRow">
+        <!-- Temperatura -->
+        <div class="card theme-temp kpiCard">
+          <h3>Temperatura zraka</h3>
+          <div class="big"><span id="kpiTemp">—</span><span style="font-size:18px; opacity:.8">°C</span></div>
+          <div class="sub">Zadnjih mjerenja: live</div>
+        </div>
+
+        <!-- Vlaga zraka (ring) -->
+        <div class="card theme-hum kpiCard">
+          <h3>Vlaga zraka</h3>
+          <div class="ringWrap">
+            <div class="ring" id="ringHum" style="--p:0; --ringColor: var(--cyan);">
+              <div class="ringInner"><span id="kpiHumPct">—</span>%</div>
+            </div>
+          </div>
+          <div class="sub" style="text-align:center; margin-top:10px;"><span id="kpiHumRaw">—</span></div>
+        </div>
+
+        <!-- Svjetlo (ring) -->
+        <div class="card theme-light kpiCard">
+          <h3>Nivo osvjetljenja</h3>
+          <div class="ringWrap">
+            <div class="ring" id="ringLdr" style="--p:0; --ringColor: var(--yellow);">
+              <div class="ringInner"><span id="kpiLdrPct">—</span>%</div>
+            </div>
+          </div>
+          <div class="sub" style="text-align:center; margin-top:10px;"><span id="kpiLdr">—</span></div>
+        </div>
+
+        <!-- Vlaga zemlje (ring) -->
+        <div class="card theme-soil kpiCard">
+          <h3>Vlaga zemlje</h3>
+          <div class="ringWrap">
+            <div class="ring" id="ringSoil" style="--p:0; --ringColor: var(--violet);">
+              <div class="ringInner"><span id="kpiSoilPct">—</span>%</div>
+            </div>
+          </div>
+          <div class="sub" style="text-align:center; margin-top:10px;"><span id="kpiSoil">—</span></div>
+        </div>
+
+        <!-- Nivo vode (ring) -->
+        <div class="card theme-water kpiCard">
+          <h3>Nivo vode u rezervoaru</h3>
+          <div class="ringWrap">
+            <div class="ring" id="ringWater" style="--p:0; --ringColor: var(--blue);">
+              <div class="ringInner"><span id="kpiWaterPct">—</span>%</div>
+            </div>
+          </div>
+          <div class="sub" style="text-align:center; margin-top:10px;"><span id="kpiWaterRaw2">—</span></div>
+        </div>
+      </div>
+
+      <div class="mainRow">
+        <!-- Status -->
+        <div class="card panel" id="statusCard">
+          <h3>Status</h3>
+          <div class="meta">
+            <div class="metaRow"><span>Zadnje mjerenje</span><b id="metaTs">—</b></div>
+            <div class="metaRow"><span>Da li je noć</span><b id="metaDark">—</b></div>
+            <div class="metaRow"><span>Da li je zemlja suha</span><b id="metaSoilDry">—</b></div>
+            <div class="metaRow"><span>Ima li vode u rezervoaru</span><b id="metaHasWater">—</b></div>
+            <div class="metaRow"><span>Potrebno zalijevanje</span><b id="metaShouldWater">—</b></div>
+          </div>
+
+          <div class="row" style="margin-top:14px;">
+            <button id="btnWaterNow">Pokreni zalijevanje</button>
+
+    <!-- SIGNALI TASK
+            <button id="btnSOS" class="secondary">
+              Pokreni SOS signal
+            </button>
+            <button id="btnStopSOS" class="zaustavi">
+              Zaustavi SOS signal
+            </button>
+            <button id="btnBlink10" class="secondary">
+  Pokreni 10x blink
+</button>
+<button id="btnStopBlink10" class="zaustavi">
+  Zaustavi 10x blink
+</button>
+ -->
+            <span class="sub" id="actionMsg" style="margin-left:10px;">—</span>
+          </div>
+
+        </div>
+
+        <!-- Historija -->
+        <div class="card panel history" id="historyCard">
+          <div class="history-head">
+            <h3>Historija mjerenja</h3>
+            <div class="history-actions">
+              <button id="btnHistory" class="chipBtn">Pregledaj sva mjerenja</button>
+              <select id="historyLimit" class="select">
+                <option value="20" selected>Zadnjih 20</option>
+                <option value="50">Zadnjih 50</option>
+                <option value="100">Zadnjih 100</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="historyMsg" class="muted">Klikni “Pregledaj sva mjerenja”.</div>
+
+          <div id="historyWrap" class="historyBody" style="display:none;">
+            <div class="table-wrap">
+              <table class="history-table">
+                <thead>
+                  <tr>
+                    <th>Vrijeme</th>
+                    <th>Temp</th>
+                    <th>Vlažnost zraka</th>
+                    <th>Zemlja</th>
+                    <th>Svjetlo</th>
+                    <th>Zalijevanje</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTbody"></tbody>
+              </table>
+            </div>
+
+            <div class="charts">
+              <div class="chart-card">
+                <h4>Temperatura kroz vrijeme</h4>
+                <div class="canvasBox"><canvas id="chartTemp"></canvas></div>
+              </div>
+
+              <div class="chart-card">
+                <h4>Vlaga zemlje kroz vrijeme</h4>
+                <div class="canvasBox"><canvas id="chartSoil"></canvas></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Log -->
+      <div class="card panel log" id="logCard">
+        <h3>Log</h3>
+
+        <div class="liveRow">
+          <span class="liveDot off" id="liveDot"></span>
+          <span id="liveText">LIVE</span>
+          <span class="muted" id="lastUpdateText">Last update: —</span>
+        </div>
+
+        <pre id="out"></pre>
+
+        <details class="rawjson">
+          <summary>Prikaži detalje / Sakrij</summary>
+          <pre id="rawJsonBox">{}</pre>
+        </details>
+      </div>
+    </section>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    </section>
+  </main>
+
+  <footer>
+    Live Server + Firebase Auth (anonymous) + RTDB (latest) + Firestore (actions/history)
+  </footer>
+
+  <script type="module" src="./app.js"></script>
+
+  <script>
+    let liveTimer = null;
+    const $ = (id) => document.getElementById(id);
+
+    // LDR SENSOR: 250 = svijetlo, 900 = mrak
+    const LDR_BRIGHT = 250;   // svijetlo 
+    const LDR_DARK = 900;   // mrak 
+//SOIL SENSOR: 1400 = mokro, 3200 = suho
+    
+    const SOIL_WET = 1400;
+    const SOIL_DRY = 3200;
+//WATER SENSOR: 300 = prazan, 900 = pun
+    const WATER_EMPTY = 300;
+    const WATER_FULL = 900;
+
+    const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+    const toPct = (v, vMin, vMax) => {
+      if (v === undefined || v === null || Number.isNaN(v)) return null;
+      const p = ((v - vMin) / (vMax - vMin)) * 100;
+      return clamp(Math.round(p), 0, 100);
+    };
+
+    // LDR procenat: 0% = mrak, 100% = svijetlo
+    const ldrPct = (ldrRaw) => {
+      if (ldrRaw === undefined || ldrRaw === null) return null;
+      // map: DARK -> 0, BRIGHT -> 100
+      const p = ((LDR_DARK - ldrRaw) / (LDR_DARK - LDR_BRIGHT)) * 100;
+      return clamp(Math.round(p), 0, 100);
+    };
+
+    // Soil procenat: 0% = suho, 100% = mokro
+    const soilPct = (soilRaw) => {
+      if (soilRaw === undefined || soilRaw === null) return null;
+      const p = ((SOIL_DRY - soilRaw) / (SOIL_DRY - SOIL_WET)) * 100;
+      return clamp(Math.round(p), 0, 100);
+    };
+
+    // Water procenat: 0% = prazno, 100% = puno
+    const waterPct = (waterRaw) => toPct(waterRaw, WATER_EMPTY, WATER_FULL);
+
+    function markLive(tsText) {
+      const dot = $("liveDot");
+      const last = $("lastUpdateText");
+      if (dot) dot.classList.remove("off");
+      if (last) last.textContent = "Last update: " + (tsText && tsText !== "—" ? tsText : "—");
+      if (liveTimer) clearTimeout(liveTimer);
+      liveTimer = setTimeout(() => { if (dot) dot.classList.add("off"); }, 15000);
+    }
+
+    function setRawJson(obj) {
+      const el = $("rawJsonBox");
+      if (!el) return;
+      try { el.textContent = JSON.stringify(obj ?? {}, null, 2); }
+      catch { el.textContent = String(obj); }
+    }
+
+    function renderPrettyLog(d, uid) {
+      const out = $("out");
+      if (!out) return;
+
+      const tsText = d?.tsText ?? "—";
+      const lines = [
+        `Ulogovan: ${uid ? uid : "—"}`,
+        "",
+        "LIVE zadnje mjerenje",
+        `ts: ${tsText}`,
+        `tempC: ${d?.tempC ?? "—"}`,
+        `humPct: ${d?.humPct ?? "—"}`,
+        `ldrRaw: ${d?.ldrRaw ?? "—"}`,
+        `soilRaw: ${d?.soilRaw ?? "—"}`,
+        `waterRaw: ${d?.waterRaw ?? "—"}`,
+        `isDark: ${d?.isDark ?? "—"}`,
+        `soilDry: ${d?.soilDry ?? "—"}`,
+        `hasWater: ${d?.hasWater ?? "—"}`,
+        `shouldWater: ${d?.shouldWater ?? "—"}`
+      ];
+      out.textContent = lines.join("\n");
+
+      markLive(tsText);
+      setRawJson(d);
+    }
+
+    window.renderUI = function (d, uid) {
+      const fmtBool = (v) => (v === true ? "Da" : v === false ? "Ne" : "—");
+      const num = (v) => (v === undefined || v === null ? "—" : v);
+
+      // temp
+      $("kpiTemp").textContent = num(d?.tempC);
+
+      // hum
+      const hp = (d?.humPct === undefined || d?.humPct === null) ? null : clamp(Math.round(d.humPct), 0, 100);
+      $("kpiHumPct").textContent = hp ?? "—";
+      $("kpiHumRaw").textContent = num(d?.humPct);
+      if ($("ringHum")) $("ringHum").style.setProperty("--p", hp ?? 0);
+
+      // ldr
+      $("kpiLdr").textContent = num(d?.ldrRaw);
+      const lp = ldrPct(d?.ldrRaw);
+      $("kpiLdrPct").textContent = lp ?? "—";
+      if ($("ringLdr")) $("ringLdr").style.setProperty("--p", lp ?? 0);
+
+      // soil
+      $("kpiSoil").textContent = num(d?.soilRaw);
+      const sp = soilPct(d?.soilRaw);
+      $("kpiSoilPct").textContent = sp ?? "—";
+      if ($("ringSoil")) $("ringSoil").style.setProperty("--p", sp ?? 0);
+
+      // water
+      $("kpiWaterRaw2").textContent = num(d?.waterRaw);
+      const wp = waterPct(d?.waterRaw);
+      $("kpiWaterPct").textContent = wp ?? "—";
+      if ($("ringWater")) $("ringWater").style.setProperty("--p", wp ?? 0);
+
+      // meta
+      $("metaTs").textContent = d?.tsText ?? "—";
+      $("metaDark").textContent = fmtBool(d?.isDark);
+      $("metaSoilDry").textContent = fmtBool(d?.soilDry);
+      $("metaHasWater").textContent = fmtBool(d?.hasWater);
+      $("metaShouldWater").textContent = fmtBool(d?.shouldWater);
+
+      // badges/pills
+      const setPill = (el, state, text) => {
+        el.classList.remove("ok", "warn", "bad");
+        if (state) el.classList.add(state);
+        el.querySelector("span:last-child").textContent = text;
+      };
+
+      setPill($("badgeAuth"), uid ? "ok" : "bad", "Auth: " + (uid ? "ulogovan" : "nije ulogovan"));
+
+      if (d?.shouldWater === true) setPill($("badgeWater"), "warn", "Pumpa: treba zaliti");
+      else if (d?.shouldWater === false) setPill($("badgeWater"), "ok", "Pumpa: ne treba");
+      else setPill($("badgeWater"), null, "Pumpa: nepoznato");
+
+      if (d?.isDark === true) setPill($("badgeLight"), "warn", "Svjetlo: noć");
+      else if (d?.isDark === false) setPill($("badgeLight"), "ok", "Svjetlo: dan");
+      else setPill($("badgeLight"), null, "Svjetlo: nepoznato");
+
+      if (d?.soilDry === true) setPill($("badgeSoil"), "warn", "Zemlja: suho");
+      else if (d?.soilDry === false) setPill($("badgeSoil"), "ok", "Zemlja: ima vlage");
+      else setPill($("badgeSoil"), null, "Zemlja: nepoznato");
+
+      if (d?.hasWater === true) setPill($("badgeTank"), "ok", "Rezervoar: ima vode");
+      else if (d?.hasWater === false) setPill($("badgeTank"), "bad", "Rezervoar: prazno");
+      else setPill($("badgeTank"), null, "Rezervoar: nepoznato");
+
+      renderPrettyLog(d, uid);
+    };
+  </script>
+</body>
+
+</html>
