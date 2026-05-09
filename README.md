@@ -236,25 +236,31 @@ docs/future-improvements.md   Planned improvements
 
 ## Screenshots
 
-```text
-Screenshots should be added inside:
+### Dashboard Home
 
-docs/screenshots/
+![Dashboard Home](docs/screenshots/dashboard-home.png)
 
-Suggested screenshots:
-- dashboard.png
-- hardware-setup.png
-- wiring-diagram.png
-```
+### Dashboard History
 
-When screenshots are added, they can be displayed like this:
+![Dashboard History](docs/screenshots/dashboard-history.png)
 
-```md
-![Dashboard](docs/screenshots/dashboard.png)
-![Hardware Setup](docs/screenshots/hardware-setup.png)
-![Wiring Diagram](docs/screenshots/wiring-diagram.png)
-```
+### Charts and Logs
 
+![Charts and Logs](docs/screenshots/dashboard-charts-log.png)
+
+### Firebase Realtime Database Structure
+
+![Firebase Realtime Database Structure](docs/screenshots/firebase-realtime-database.png)
+
+### FSM Diagram
+
+![FSM Diagram](docs/screenshots/fsm-diagram.png)
+
+## Hardware Note
+
+The physical prototype was assembled and tested during development, but it was later disassembled before taking a final hardware photo.
+
+Because of that, this repository focuses on dashboard screenshots, Firebase data structure, FSM logic diagram, and written hardware/wiring documentation.
 ## Future Improvements
 
 ```text
