@@ -1,11 +1,32 @@
+# Test Folder
 
-This directory is intended for PlatformIO Test Runner and project tests.
+This folder is reserved for PlatformIO tests.
 
-Unit Testing is a software testing method by which individual units of
-source code, sets of one or more MCU program modules together with associated
-control data, usage procedures, and operating procedures, are tested to
-determine whether they are fit for use. Unit testing finds problems early
-in the development cycle.
+## Purpose
 
-More information about PlatformIO Unit Testing:
-- https://docs.platformio.org/en/latest/advanced/unit-testing/index.html
+```text
+Tests can be added here to verify firmware logic.
+
+Possible future tests:
+
+- sensor value conversion
+- moisture threshold logic
+- command handling logic
+- utility functions
+```
+
+## Current Status
+
+```text
+No automated tests are currently included.
+
+The project is currently tested manually using the ESP32 board, serial monitor, Firebase, and the web dashboard.
+```
+
+## PlatformIO Testing
+
+PlatformIO tests can be run with:
+
+```bash
+pio test
+```
