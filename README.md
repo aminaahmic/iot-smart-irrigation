@@ -284,6 +284,8 @@ It was built as an IoT prototype for smart plant monitoring, automated irrigatio
 
 ## Author
 
-```text
-Amina Ahmić
-```
+- Amina Ahmic
+
+## License
+
+This project is licensed under the MIT License.

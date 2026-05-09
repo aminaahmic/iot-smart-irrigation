@@ -1,109 +1,109 @@
 # Firebase Structure
 
-This document describes the Firebase structure used by the IoT Smart Irrigation System.
+This document describes the Firebase Realtime Database structure used in the IoT Smart Irrigation System.
 
-## Firebase Services
-
-```text
-The project uses Firebase for:
-
-- Realtime Database
-- Firestore
-- Firebase Hosting
-- Firebase Cloud Functions
-```
-
-## Realtime Database Purpose
+## Root Structure
 
 ```text
-Firebase Realtime Database stores the latest live state of the ESP32 device.
-
-It is used for:
-
-- Live sensor values
-- Current irrigation status
-- Manual commands from the dashboard
-- Device state updates
+devices
+└── esp32-001
+    ├── commands
+    ├── live
+    └── state
+        └── latest
 ```
 
-## Example Realtime Database Structure
+## Commands
 
 ```json
-{
-  "devices": {
-    "esp32-001": {
-      "latest": {
-        "temperature": 24.5,
-        "humidity": 62,
-        "soilMoisture": 1850,
-        "lightLevel": 720,
-        "waterLevel": 1,
-        "watering": false,
-        "updatedAt": "2026-05-09T12:00:00Z"
-      },
-      "commands": {
-        "manualWatering": false,
-        "signalLed": false,
-        "blinkCommand": false
-      }
-    }
+"commands": {
+  "blink10": false,
+  "blink10Stop": false,
+  "sos": false,
+  "sosStop": false,
+  "waterNow": false
+}
+```
+
+## Purpose of Commands
+
+```text
+blink10       -> triggers LED blinking sequence
+blink10Stop   -> stops blinking sequence
+sos           -> triggers SOS LED signal
+sosStop       -> stops SOS LED signal
+waterNow      -> triggers manual watering
+```
+
+## Live Data
+
+```json
+"live": {
+  "hasWater": true,
+  "humPct": 55.7,
+  "isDark": true,
+  "ldrRaw": 863,
+  "shouldWater": false,
+  "soilDry": true,
+  "soilRaw": 3091,
+  "tempC": 28.2,
+  "ts": 950570,
+  "waterRaw": 709
+}
+```
+
+## Latest State
+
+```json
+"state": {
+  "latest": {
+    "hasWater": true,
+    "humPct": 37.4,
+    "isDark": false,
+    "ldrRaw": 626,
+    "manualWatering": false,
+    "shouldWater": true,
+    "soilDry": true,
+    "soilRaw": 3226,
+    "tempC": 20.2,
+    "tsEpochMs": 1774694499000,
+    "tsText": "28/03/2026 10:41:39",
+    "uptimeMs": 306938,
+    "waterRaw": 895
   }
 }
 ```
 
-## Firestore Purpose
+## Field Meaning
 
 ```text
-Firestore can be used for storing sensor readings history.
-
-This allows the dashboard to display:
-
-- Previous temperature readings
-- Previous humidity readings
-- Soil moisture history
-- Irrigation history
-- Chart data
+hasWater        -> indicates whether there is enough water in the reservoir
+humPct          -> air humidity percentage
+isDark          -> indicates whether the environment is dark
+ldrRaw          -> raw light sensor value
+shouldWater     -> indicates whether the system should activate watering
+soilDry         -> indicates whether the soil is dry
+soilRaw         -> raw soil moisture sensor value
+tempC           -> temperature in Celsius
+ts / tsEpochMs  -> timestamp
+tsText          -> formatted date and time string
+uptimeMs        -> ESP32 uptime in milliseconds
+waterRaw        -> raw water level sensor value
+manualWatering  -> indicates whether manual watering is active
 ```
 
-## Example Firestore Collection
+## Data Flow
 
 ```text
-readings/
-  readingId/
-    deviceId
-    temperature
-    humidity
-    soilMoisture
-    lightLevel
-    waterLevel
-    watering
-    createdAt
-```
-
-## Cloud Functions Purpose
-
-```text
-Firebase Cloud Functions can be used to copy or mirror the latest reading from Realtime Database into Firestore.
-
-This keeps the Realtime Database focused on live state, while Firestore stores historical data.
-```
-
-## Dashboard Connection
-
-```text
-The web dashboard connects to Firebase and listens for changes in the device state.
-
-When the ESP32 sends new data, the dashboard updates automatically.
-
-When the user sends a command, the command is stored in Firebase and then read by the ESP32.
-```
-
-## Security Notes
-
-```text
-Firebase keys and configuration values should not be treated the same as passwords, but sensitive configuration should still be handled carefully.
-
-Real credentials and project-specific values should not be hardcoded in public source code when possible.
-
-Rules should be configured in Firebase to prevent unauthorized access.
+ESP32 reads sensors
+        ↓
+ESP32 writes live data to Firebase Realtime Database
+        ↓
+Dashboard reads live data and shows current status
+        ↓
+User sends command from dashboard
+        ↓
+Command is written into /commands
+        ↓
+ESP32 reads command and performs the requested action
 ```
