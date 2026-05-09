@@ -7,16 +7,18 @@
 #include "addons/TokenHelper.h"
 #include "addons/RTDBHelper.h"
 
-// ================= WIFI ================= firebase deploy --only hosting
-const char* ssid = "XXXX";
-const char* password = "XXXXX";
+#include "config.h"
+
+// ================= WIFI =================
+const char* ssid = WIFI_SSID;
+const char* password = WIFI_PASSWORD;
 
 // ================= FIREBASE =================
-#define API_KEY "AIzaSyAzRZ9NLdM-go5sP--39qZwRfJkrMy5Mqw"
-#define FIREBASE_PROJECT_ID "iot-projekat-zalijevanje"
-#define DATABASE_URL "https://iot-projekat-zalijevanje-default-rtdb.europe-west1.firebasedatabase.app"
+#define API_KEY FIREBASE_API_KEY
+#define FIREBASE_PROJECT_ID FIREBASE_PROJECT_ID_VALUE
+#define DATABASE_URL FIREBASE_DATABASE_URL
 
-String DEVICE_ID = "esp32-001";
+String DEVICE_ID = DEVICE_ID_VALUE;
 
 // ================= PINOVI =================
 #define PIN_DHT    4
