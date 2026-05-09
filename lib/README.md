@@ -1,46 +1,30 @@
+# Library Folder
 
-This directory is intended for project specific (private) libraries.
-PlatformIO will compile them to static libraries and link into the executable file.
+This folder is reserved for custom PlatformIO libraries.
 
-The source code of each library should be placed in a separate directory
-("lib/your_library_name/[Code]").
+## Purpose
 
-For example, see the structure of the following example libraries `Foo` and `Bar`:
+```text
+If the project grows, reusable firmware logic can be moved into custom libraries.
 
-|--lib
-|  |
-|  |--Bar
-|  |  |--docs
-|  |  |--examples
-|  |  |--src
-|  |     |- Bar.c
-|  |     |- Bar.h
-|  |  |- library.json (optional. for custom build options, etc) https://docs.platformio.org/page/librarymanager/config.html
-|  |
-|  |--Foo
-|  |  |- Foo.c
-|  |  |- Foo.h
-|  |
-|  |- README --> THIS FILE
-|
-|- platformio.ini
-|--src
-   |- main.c
+Examples:
 
-Example contents of `src/main.c` using Foo and Bar:
-```
-#include <Foo.h>
-#include <Bar.h>
-
-int main (void)
-{
-  ...
-}
-
+- sensor reading logic
+- Firebase communication logic
+- pump control logic
+- utility functions
 ```
 
-The PlatformIO Library Dependency Finder will find automatically dependent
-libraries by scanning project source files.
+## Current Status
 
-More information about PlatformIO Library Dependency Finder
-- https://docs.platformio.org/page/librarymanager/ldf.html
+```text
+The project currently keeps the main firmware logic inside src/main.cpp.
+
+Custom libraries can be added later if the firmware becomes larger.
+```
+
+## PlatformIO Notes
+
+```text
+PlatformIO automatically detects libraries placed inside this folder.
+```
