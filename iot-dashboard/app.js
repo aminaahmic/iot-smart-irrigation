@@ -18,14 +18,14 @@ import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebase
 
 // ================= FIREBASE CONFIG =================
 const firebaseConfig = {
-  apiKey: "AIzaSyAzRZ9NLdM-go5sP--39qZwRfJkrMy5Mqw",
-  authDomain: "iot-projekat-zalijevanje.firebaseapp.com",
-  projectId: "iot-projekat-zalijevanje",
-  storageBucket: "iot-projekat-zalijevanje.firebasestorage.app",
-  messagingSenderId: "458906723375",
-  appId: "1:458906723375:web:803996f80054538b2212da",
-  measurementId: "G-454TYLQ8KH",
-  databaseURL: "https://iot-projekat-zalijevanje-default-rtdb.europe-west1.firebasedatabase.app"
+  apiKey: "your-firebase-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.firebasestorage.app",
+  messagingSenderId: "your-sender-id",
+  appId: "your-app-id",
+  measurementId: "your-measurement-id",
+  databaseURL: "https://your-project-default-rtdb.firebaseio.com"
 };
 
 const DEVICE_ID = "esp32-001";
